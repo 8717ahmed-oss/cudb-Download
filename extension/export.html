@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CDAS 查询结果导出</title>
+  <link rel="stylesheet" href="export.css">
+  <script type="module" src="export.js"></script>
+</head>
+<body>
+  <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 9h18M9 9v12M9 15h12"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3a7 7 0 0 0 11.6-1"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="3"/><path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></symbol>
+  </svg>
+  <a class="skip-link" href="#workspace">跳到导出工作区</a>
+  <header class="app-header"><div class="header-inner">
+    <a href="#workspace" class="brand" aria-label="CDAS 导出工作区"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg></span><span>CDAS<span class="brand-divider">/</span><span class="brand-caption">数据导出</span></span></a>
+    <nav aria-label="页面导航"><a href="#workspace">工作区</a><a href="#results">结果预览</a><a href="#guide">使用说明</a></nav>
+    <span class="local-badge"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>仅在本机处理</span>
+  </div></header>
+  <main>
+    <div class="page-heading">
+      <div><p class="eyebrow">QUERY RESULT EXPORTER</p><h1>查询结果导出<span class="heading-dot">.</span></h1><p class="intro">读取页面中的查询结果，保存为你需要的格式。</p></div>
+      <div class="workflow-note"><span class="workflow-line" aria-hidden="true"><i>1</i><b></b><i>2</i><b></b><i>3</i></span><p>选择结果<span> / </span>读取数据<span> / </span>导出文件</p></div>
+    </div>
+    <div id="workspace" class="workspace">
+      <aside class="control-panel glass-panel" aria-label="查询结果读取控制">
+        <section aria-labelledby="source-heading">
+          <div class="section-heading"><h2 id="source-heading"><span class="section-index">01</span>选择结果</h2><button id="refresh" class="text-button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>重新识别</button></div>
+          <label for="source">结果表格</label><select id="source" aria-describedby="source-note" disabled><option>正在识别页面…</option></select>
+          <p id="source-note" class="hint">支持 CDAS 结果页和嵌入的查询窗口。</p>
+          <div id="status" class="status" role="status" aria-live="polite">正在读取页面…</div>
+        </section>
+        <section class="collection-section" aria-labelledby="collect-heading">
+          <div class="section-heading"><h2 id="collect-heading"><span class="section-index">02</span>读取数据</h2></div>
+          <div class="read-option">
+            <div class="option-heading"><h3>当前页</h3><span class="quiet-tag">不新增查询</span></div>
+            <p class="hint">读取已加载的所有行，保留单元格完整内容。</p>
+            <button id="read" class="primary wide-button" disabled>读取当前页<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+          <div class="read-option batch-option">
+            <div class="option-heading"><h3>连续分页</h3><span class="request-tag">会触发查询</span></div>
+            <p class="hint">从第 1 页开始，按网站原有分页依次读取。</p>
+            <div class="limits"><label for="max-pages">最多页数<input id="max-pages" type="number" value="100" min="1" max="1000" inputmode="numeric"></label><label for="max-rows">最多行数<input id="max-rows" type="number" value="50000" min="1" max="200000" inputmode="numeric"></label></div>
+            <div class="button-row"><button id="collect" class="secondary wide-button" disabled>从第 1 页连续读取<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button id="stop" class="danger wide-button" hidden>停止读取</button></div>
+            <p class="hint collection-note">读取期间请保持原查询不变。结束后，原页面会停在最后读取的页。</p>
+          </div>
+        </section>
+      </aside>
+      <section id="results" class="preview-panel glass-panel" aria-labelledby="export-heading">
+        <div class="section-heading preview-heading"><div><p class="eyebrow">YOUR QUERY, READY TO GO</p><h2 id="export-heading">结果预览</h2></div><span class="preview-label"><span></span>前 8 行</span></div>
+        <div class="stats" aria-label="已读取数据统计"><div><span>已读取行数</span><strong id="row-count">0</strong><small>行</small></div><div><span>数据列数</span><strong id="column-count">0</strong><small>列</small></div><div><span>已读取页数</span><strong id="page-count">0</strong><small>页</small></div></div>
+        <p id="result-note" class="result-note" aria-live="polite">尚未读取数据。</p>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="查询结果表格，可横向滚动查看所有列"><table id="preview"><caption class="sr-only">查询结果预览</caption><thead></thead><tbody><tr><td class="empty">读取后在这里预览结果</td></tr></tbody></table></div>
+        <p class="table-scroll-hint">左右滚动表格，查看全部列</p>
+        <div class="export-actions">
+          <div class="export-caption"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg><span>保存这份结果</span></div>
+          <div class="button-row"><button id="csv" class="primary" disabled><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>导出 CSV</button><button id="json" class="secondary" disabled>导出 JSON</button><button id="copy" class="secondary" disabled><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>复制到表格</button></div>
+          <p class="hint export-hint">CSV 可用 Excel / Numbers 打开。复制后可直接粘贴到表格。</p>
+        </div>
+      </section>
+    </div>
+    <section id="guide" class="guide" aria-labelledby="guide-heading">
+      <div class="guide-intro"><span class="guide-icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></span><div><h2 id="guide-heading">数据留在你的电脑</h2><p>无需额外登录，不连接外部服务，不上传查询结果。</p></div></div>
+      <details><summary>导出格式与读取范围<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></summary><div class="guide-content"><p><strong>CSV 与复制</strong>：NULL 留空；公式样式的文本按文本导出。长编号、前导零建议通过 Excel「从文本/CSV」导入并将列设为文本。</p><p><strong>JSON</strong>：保留字段类型、NULL 和原始文本，适合需要完整数据的情况。</p><p><strong>连续分页</strong>：会通过网站原有功能发起查询。可读取范围以 CDAS 返回结果为准，不绕过权限或查询条数限制。</p></div></details>
+    </section>
+    <footer><span>CDAS Exporter</span><span>为查询结果，留一份清晰的副本。<span class="footer-version">v1.1.0</span></span></footer>
+  </main>
+</body>
+</html>
